@@ -185,7 +185,6 @@ public class KafkaTopicRepository implements TopicRepository {
                     item.getPartition(),
                     item.getEvent().toString());
 
-            circuitBreaker.markStart();
             producer.send(kafkaRecord, ((metadata, exception) -> {
                 if (null != exception) {
                     LOG.warn("Failed to publish to kafka topic {}", topicId, exception);
@@ -245,7 +244,7 @@ public class KafkaTopicRepository implements TopicRepository {
             for (final BatchItem item : batch) {
                 item.setStep(EventPublishingStep.PUBLISHING);
                 final HystrixKafkaCircuitBreaker circuitBreaker = circuitBreakers.computeIfAbsent(
-                        item.getBrokerId(), brokerId -> new HystrixKafkaCircuitBreaker(brokerId));
+                        item.getBrokerId(), brokerId -> new HystrixKafkaCircuitBreaker());
                 if (circuitBreaker.allowRequest()) {
                     sendFutures.put(item, publishItem(producer, topicId, item, circuitBreaker));
                 } else {
