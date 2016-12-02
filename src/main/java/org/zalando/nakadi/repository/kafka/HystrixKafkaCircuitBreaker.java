@@ -75,9 +75,8 @@ public class HystrixKafkaCircuitBreaker {
         long currentRollingWindowLast = rollingWindowLastUpdate.get();
         if (System.currentTimeMillis() > currentRollingWindowLast + ROLLING_WINDOW) {
             rollingWindowLastUpdate.compareAndSet(currentRollingWindowLast, System.currentTimeMillis());
-            final long currentTotal = totalCount.get();
-            totalCount.addAndGet(-totalRollingWindowCount.get());
-            if (totalCount.get() < 0) {
+            final long currentTotal = totalCount.addAndGet(-totalRollingWindowCount.get());
+            if (currentTotal < 0) {
                 totalCount.set(0);
             }
             totalRollingWindowCount.set(currentTotal);
@@ -98,7 +97,7 @@ public class HystrixKafkaCircuitBreaker {
         final StringBuilder sb = new StringBuilder("HystrixKafkaCircuitBreaker{");
         sb.append("totalCount=").append(currentTotal);
         sb.append(", failuresCount=").append(currentFailures);
-        sb.append(", error=").append(currentTotal == 0 ? 0 : (int) (double) currentFailures / currentTotal * 100);
+        sb.append(", error=").append(currentTotal == 0 ? 0 : (int) ((double) currentFailures / currentTotal * 100));
         sb.append("%}");
         return sb.toString();
     }
