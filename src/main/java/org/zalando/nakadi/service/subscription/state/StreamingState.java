@@ -475,7 +475,7 @@ class StreamingState extends State {
                 reconfigureKafkaConsumer(true);
             }
 
-	    if (commitResult.committedCount > 0) {
+	        if (commitResult.committedCount > 0) {
                 committedEvents += commitResult.committedCount;
                 this.lastCommitMillis = System.currentTimeMillis();
                 streamToOutput();
